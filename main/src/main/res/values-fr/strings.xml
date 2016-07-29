@@ -363,4 +363,6 @@ Sur certaines images, cette notification joue un son.\nAndroid à introduit ces 
   <string name="enabled_connection_entry">Activé</string>
   <string name="permission_revoked">Autorisation de VPN révoquée par le système d\'exploitation (ex : un autre programme VPN est lancé), arrêt du VPN</string>
   <string name="pw_request_dialog_prompt">Veuillez entrer le mot de passe pour le profil %1$s</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

@@ -119,4 +119,6 @@
   <string name="openvpn_log">Registre OpenVPN</string>
   <string name="import_config">Importa la configuració OpenVPN</string>
   <string name="battery_consumption_title">Consum de la bateria</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

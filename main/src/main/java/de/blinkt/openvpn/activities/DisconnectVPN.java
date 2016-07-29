@@ -10,11 +10,17 @@ import android.app.AlertDialog;
 import android.content.*;
 import android.os.IBinder;
 
+import com.sun.jna.NativeLong;
+
 import de.blinkt.openvpn.LaunchVPN;
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.VpnProfile;
 import de.blinkt.openvpn.core.OpenVPNService;
 import de.blinkt.openvpn.core.ProfileManager;
+import de.blinkt.openvpn.pkcs11.Pkcs11Constants;
+import de.blinkt.openvpn.pkcs11.RtPkcs11Library;
+import de.blinkt.openvpn.pkcs11.exception.Pkcs11CallerException;
+import de.blinkt.openvpn.pkcs11.exception.Pkcs11Exception;
 
 /**
  * Created by arne on 13.10.13.
@@ -72,8 +78,18 @@ public class DisconnectVPN extends Activity implements DialogInterface.OnClickLi
         VpnProfile lastVPN = ProfileManager.getLastConnectedVpn();
         if (which == DialogInterface.BUTTON_POSITIVE) {
             ProfileManager.setConntectedVpnProfileDisconnected(this);
-            if (mService != null && mService.getManagement() != null)
+            if (mService != null && mService.getManagement() != null){
+
                 mService.getManagement().stopVPN(false);
+                try {
+                    NativeLong rv = RtPkcs11Library.getInstance().C_Finalize(null);
+                    if (!rv.equals(Pkcs11Constants.CKR_OK)){
+                        throw Pkcs11Exception.exceptionWithCode(rv);
+                    }
+                }catch (Pkcs11CallerException e){
+                    e.printStackTrace();
+                }
+            }
         } else if (which == DialogInterface.BUTTON_NEUTRAL && lastVPN !=null) {
             Intent intent = new Intent(this, LaunchVPN.class);
             intent.putExtra(LaunchVPN.EXTRA_KEY, lastVPN.getUUID().toString());

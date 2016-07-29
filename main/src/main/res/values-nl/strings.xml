@@ -139,4 +139,6 @@
   <string name="edit_profile_title">Bewerken van \"%s\"</string>
   <string name="building_configration">Opbouwen configuratie&#8230;</string>
   <string name="ipdns">IP en DNS</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

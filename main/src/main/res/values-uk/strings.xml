@@ -380,4 +380,6 @@
   <string name="connect_timeout">Час очікування з\'єднання</string>
   <string name="protocol">Протокол</string>
   <string name="enabled_connection_entry">Ввімкнено</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

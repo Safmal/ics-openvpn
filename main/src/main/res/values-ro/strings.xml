@@ -271,4 +271,6 @@
   <string name="screenoff_pause">Se suspendă conexiunea în starea ecran oprit: mai puţin de %1$s în %2$s</string>
   <string name="screen_nopersistenttun">Atenție: TUN persistent nu este activat pentru acest VPN. Traficul va utiliza conexiunea Internet normala atunci când ecranul este oprit.</string>
   <string name="save_password">Salvare parola</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

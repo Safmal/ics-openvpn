@@ -449,4 +449,6 @@ Android 4.4以上はポリシールーティングを使用します。route/ifc
   <string name="samsung_broken_title">サムスン製の機種</string>
   <string name="novpn_selected">VPNが選択されていません</string>
   <string name="alwaysonvpn">起動時と常時接続に使用するVPN</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

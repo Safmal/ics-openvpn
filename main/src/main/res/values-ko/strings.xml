@@ -322,4 +322,6 @@
   <string name="payload_options">페이로드 옵션</string>
   <string name="tls_settings">TLS 설정</string>
   <string name="faq_androids_clients_title">안드로이드 OpenVPN 클라이언트 간의 차이</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

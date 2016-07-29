@@ -292,4 +292,6 @@
   <string name="version_upto">%s e anteriores</string>
   <string name="copy_of_profile">Copiar de %s</string>
   <string name="custom_connection_options">Opções personalizadas</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

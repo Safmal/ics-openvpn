@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="token_pin">Token pin</string>
+    <string name="pkcs11_id">PKCS11 id</string>
+</resources>

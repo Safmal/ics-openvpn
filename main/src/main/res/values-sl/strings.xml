@@ -410,4 +410,6 @@
   <string name="samsung_broken_title">Telefoni Samsung</string>
   <string name="novpn_selected">VPN ni izbran.</string>
   <string name="alwaysonvpn">VPN se uporablja ob zagonu in ob stalno vklopljeni napravi</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

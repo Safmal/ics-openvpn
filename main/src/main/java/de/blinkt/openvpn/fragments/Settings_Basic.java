@@ -59,6 +59,8 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
 	private View mView;
 	private EditText mProfileName;
 	private EditText mKeyPassword;
+	private EditText mPkcs11Id;
+	private EditText mTokenPin;
 
 	private SparseArray<FileSelectLayout> fileselects = new SparseArray<>();
 
@@ -137,6 +139,9 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
 		mPassword = (EditText) mView.findViewById(R.id.auth_password);
 		mKeyPassword = (EditText) mView.findViewById(R.id.key_password);
 
+		mPkcs11Id = (EditText) mView.findViewById(id.pkcs11Id);
+		mTokenPin = (EditText) mView.findViewById(id.pkcs11TokenPin);
+
 		addFileSelectLayout(mCaCert, Utils.FileType.CA_CERTIFICATE);
 		addFileSelectLayout(mClientCert, Utils.FileType.CLIENT_CERTIFICATE);
 		addFileSelectLayout(mClientKey, Utils.FileType.KEYFILE);
@@ -202,6 +207,7 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
         ((FileSelectLayout) mView.findViewById(R.id.caselect)).setClearable(false);
         mView.findViewById(R.id.userpassword).setVisibility(View.GONE);
 		mView.findViewById(R.id.key_password_layout).setVisibility(View.GONE);
+		mView.findViewById(id.tokensPin).setVisibility(View.GONE);
 
 		// Fall through are by design
 		switch(type) {
@@ -236,6 +242,10 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
 			mView.findViewById(R.id.userpassword).setVisibility(View.VISIBLE);
 			mView.findViewById(R.id.cacert).setVisibility(View.VISIBLE);
 			break;
+		case VpnProfile.TYPE_PKCS11:
+			mView.findViewById(R.id.cacert).setVisibility(View.VISIBLE);
+			mView.findViewById(id.tokensPin).setVisibility(View.VISIBLE);
+			break;
 		}
 
 
@@ -249,12 +259,15 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
         mCrlFile.setData(mProfile.mCrlFilename, getActivity());
 
 		mUseLzo.setChecked(mProfile.mUseLzo);
-		mType.setSelection(mProfile.mAuthenticationType);
+		mType.setSelection(mProfile.mAuthenticationType); //
 		mpkcs12.setData(mProfile.mPKCS12Filename, getActivity());
 		mPKCS12Password.setText(mProfile.mPKCS12Password);
 		mUserName.setText(mProfile.mUsername);
 		mPassword.setText(mProfile.mPassword);
 		mKeyPassword.setText(mProfile.mKeyPassword);
+
+		mTokenPin.setText(mProfile.mTokenPin);
+		mPkcs11Id.setText(mProfile.mPkcs11Id);
 
 		setAlias();
 
@@ -276,6 +289,9 @@ public class Settings_Basic extends Settings_Fragment implements View.OnClickLis
 		mProfile.mPassword = mPassword.getText().toString();
 		mProfile.mUsername = mUserName.getText().toString();
 		mProfile.mKeyPassword = mKeyPassword.getText().toString();
+
+		mProfile.mPkcs11Id = mPkcs11Id.getText().toString();
+		mProfile.mTokenPin = mTokenPin.getText().toString();
 
 	}
 

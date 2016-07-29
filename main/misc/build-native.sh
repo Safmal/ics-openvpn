@@ -26,7 +26,7 @@ else
 fi
 
 if [ "x$1" = "x" ]; then
-    ndk-build  -j 8 USE_BREAKPAD=0
+    /Users/Malik/Library/Android/sdk/ndk-bundle/ndk-build  -j 8 USE_BREAKPAD=0
 else
   ndk-build $@
 fi

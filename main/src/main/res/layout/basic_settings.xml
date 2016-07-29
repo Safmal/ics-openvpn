@@ -203,6 +203,41 @@
                 android:singleLine="false"
                 android:text="@string/static_keys_info" />
         </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tokensPin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/item"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:text="@string/pkcs11_id"
+                android:textAppearance="?android:attr/textAppearanceSmall"/>
+
+            <EditText
+                android:id="@+id/pkcs11Id"
+                style="@style/item"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:inputType="textNoSuggestions" />
+
+            <TextView
+                style="@style/item"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:text="@string/token_pin"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+            <EditText
+                android:id="@+id/pkcs11TokenPin"
+                style="@style/item"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:inputType="textPassword" />
+        </LinearLayout>
         <de.blinkt.openvpn.views.FileSelectLayout
             android:id="@+id/crlfile"
             android:layout_width="match_parent"

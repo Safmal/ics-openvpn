@@ -6,6 +6,7 @@
 package de.blinkt.openvpn;
 
 import android.annotation.SuppressLint;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -19,6 +20,10 @@ import android.security.KeyChainException;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
+
+import com.sun.jna.NativeLong;
+import com.sun.jna.ptr.NativeLongByReference;
 
 import org.spongycastle.util.io.pem.PemObject;
 import org.spongycastle.util.io.pem.PemWriter;
@@ -56,7 +61,17 @@ import de.blinkt.openvpn.core.VPNLaunchHelper;
 import de.blinkt.openvpn.core.VpnStatus;
 import de.blinkt.openvpn.core.X509Utils;
 
-public class VpnProfile implements Serializable, Cloneable {
+import de.blinkt.openvpn.fragments.EnterPinDialogFragment;
+import de.blinkt.openvpn.pkcs11.CK_C_INITIALIZE_ARGS;
+import de.blinkt.openvpn.pkcs11.CK_SLOT_INFO;
+import de.blinkt.openvpn.pkcs11.Pkcs11Constants;
+import de.blinkt.openvpn.pkcs11.RtPkcs11Library;
+import de.blinkt.openvpn.pkcs11.Token;
+import de.blinkt.openvpn.pkcs11.exception.PinEmptyException;
+import de.blinkt.openvpn.pkcs11.exception.Pkcs11CallerException;
+import de.blinkt.openvpn.pkcs11.exception.Pkcs11Exception;
+
+public class VpnProfile implements Serializable, Cloneable, EnterPinDialogFragment.enterPinDialogListener {
     // Note that this class cannot be moved to core where it belongs since
     // the profile loading depends on it being here
     // The Serializable documentation mentions that class name change are possible
@@ -87,6 +102,11 @@ public class VpnProfile implements Serializable, Cloneable {
     public static final int TYPE_USERPASS_CERTIFICATES = 5;
     public static final int TYPE_USERPASS_PKCS12 = 6;
     public static final int TYPE_USERPASS_KEYSTORE = 7;
+
+    // added for pkcs11 //
+    public static final int TYPE_PKCS11 = 8;
+    //**//
+
     public static final int X509_VERIFY_TLSREMOTE = 0;
     public static final int X509_VERIFY_TLSREMOTE_COMPAT_NOREMAPPING = 1;
     public static final int X509_VERIFY_TLSREMOTE_DN = 2;
@@ -126,7 +146,7 @@ public class VpnProfile implements Serializable, Cloneable {
     public boolean mRoutenopull = false;
     public boolean mUseRandomHostname = false;
     public boolean mUseFloat = false;
-    public boolean mUseCustomConfig = false;
+    public boolean mUseCustomConfig = false; //changed from false to true
     public String mCustomConfigOptions = "";
     public String mVerb = "1";  //ignored
     public String mCipher = "";
@@ -168,6 +188,14 @@ public class VpnProfile implements Serializable, Cloneable {
     public String mServerName = "openvpn.blinkt.de";
     public String mServerPort = "1194";
     public boolean mUseUdp = true;
+
+    /* PKCS11 attributes */
+
+    public String mTokenPin;
+    public String mPkcs11Id;
+    public Token mToken;
+
+    //**//
 
     public VpnProfile(String name) {
         mUuid = UUID.randomUUID();
@@ -389,6 +417,65 @@ public class VpnProfile implements Serializable, Cloneable {
             case VpnProfile.TYPE_USERPASS:
                 cfg += "auth-user-pass\n";
                 cfg += insertFileData("ca", mCaFilename);
+                break;
+
+            //If enable PKCS11, add Ca
+            case VpnProfile.TYPE_PKCS11:
+            {
+                //add CA
+                cfg += insertFileData("ca", mCaFilename);
+
+                //Load and initialize pkcs11 library
+                try {
+                    NativeLong rv;
+
+                    VpnStatus.logMessageOpenVPN(VpnStatus.LogLevel.INFO, 4, "Initializing PKCS11 library");
+                    CK_C_INITIALIZE_ARGS initializeArgs = new CK_C_INITIALIZE_ARGS(null, null, null, null, Pkcs11Constants.CKF_OS_LOCKING_OK, null);
+                    rv = RtPkcs11Library.getInstance().C_Initialize(initializeArgs);
+
+                    if (!rv.equals(Pkcs11Constants.CKR_OK)) {
+                        if (!rv.equals(new NativeLong(0x00000191)))
+                        {
+                            throw Pkcs11Exception.exceptionWithCode(rv);
+                        }
+                    }
+                    VpnStatus.logMessageOpenVPN(VpnStatus.LogLevel.INFO, 4, "PKCS11 library initialized");
+                    Log.d("PKCS11", "Library Initialized");
+
+                    NativeLongByReference slotCount = new NativeLongByReference(new NativeLong(0));
+                    rv = RtPkcs11Library.getInstance().C_GetSlotList(true, null, slotCount);
+
+                    if (!rv.equals(Pkcs11Constants.CKR_OK)) {
+                        throw Pkcs11Exception.exceptionWithCode(rv);
+                    }
+
+                    NativeLong slotIds[] = new NativeLong[slotCount.getValue().intValue()];
+                    rv = RtPkcs11Library.getInstance().C_GetSlotList(true, slotIds, slotCount);
+
+                    if (!rv.equals(Pkcs11Constants.CKR_OK)) {
+                        throw Pkcs11Exception.exceptionWithCode(rv);
+                    }
+
+                    NativeLongByReference id = new NativeLongByReference();
+
+                    Log.d("PKCS11", "slot id: "  + id.getValue().toString());
+
+                    VpnStatus.logMessageOpenVPN(VpnStatus.LogLevel.INFO, 4, "Token is connected");
+                    VpnStatus.logMessageOpenVPN(VpnStatus.LogLevel.INFO, 4, "Getting the certificate");
+
+                    NativeLong slotId = id.getValue();
+                    mToken = new Token(slotId, mPkcs11Id);
+                    // for configurate file need certificate in PEM string enclosed in <cert> ... </cert>
+                    cfg += "<cert>\n" + mToken.getCertificate() + "\n</cert>\n";
+                    cfg += "management-external-key\n";
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                break;
+            }
         }
 
         if (!TextUtils.isEmpty(mCrlFilename))
@@ -552,6 +639,13 @@ public class VpnProfile implements Serializable, Cloneable {
                 }
             }
         }
+
+        //Add path to provider and pkcs11Id
+        /*if (mAuthenticationType == VpnProfile.TYPE_PKCS11)
+        {
+            cfg += "pkcs11-providers " + mPkcs11Provider + "\n";
+            cfg += "pkcs11-id " + "\'" + mPkcs11Id + "\'\n";
+        }*/
 
 
         return cfg;
@@ -738,7 +832,6 @@ public class VpnProfile implements Serializable, Cloneable {
             return null;
         }
     }
-
 
     class NoCertReturnedException extends Exception {
         public NoCertReturnedException(String msg) {
@@ -1005,34 +1098,55 @@ public class VpnProfile implements Serializable, Cloneable {
     }
 
     public String getSignedData(String b64data) {
-        PrivateKey privkey = getKeystoreKey();
 
-        byte[] data = Base64.decode(b64data, Base64.DEFAULT);
+        if (mAuthenticationType == TYPE_PKCS11){
 
-        // The Jelly Bean *evil* Hack
-        // 4.2 implements the RSA/ECB/PKCS1PADDING in the OpenSSLprovider
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN) {
-            return processSignJellyBeans(privkey, data);
+            final byte[] data = Base64.decode(b64data, Base64.DEFAULT);
+
+            try {
+
+                if (mTokenPin.equals("")){
+                    throw new PinEmptyException();
+                }
+                String signedData = mToken.signData(data, mTokenPin);
+                return signedData;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "";
+            }
+
         }
+        else {
+            PrivateKey privkey = getKeystoreKey();
+
+            byte[] data = Base64.decode(b64data, Base64.DEFAULT);
+
+            // The Jelly Bean *evil* Hack
+            // 4.2 implements the RSA/ECB/PKCS1PADDING in the OpenSSLprovider
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.JELLY_BEAN) {
+                return processSignJellyBeans(privkey, data);
+            }
 
 
-        try {
+            try {
 
             /* ECB is perfectly fine in this special case, since we are using it for
                the public/private part in the TLS exchange
              */
-            @SuppressLint("GetInstance")
-            Cipher rsaSigner = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
+                @SuppressLint("GetInstance")
+                Cipher rsaSigner = Cipher.getInstance("RSA/ECB/PKCS1PADDING");
 
-            rsaSigner.init(Cipher.ENCRYPT_MODE, privkey);
+                rsaSigner.init(Cipher.ENCRYPT_MODE, privkey);
 
-            byte[] signed_bytes = rsaSigner.doFinal(data);
-            return Base64.encodeToString(signed_bytes, Base64.NO_WRAP);
+                byte[] signed_bytes = rsaSigner.doFinal(data);
+                return Base64.encodeToString(signed_bytes, Base64.NO_WRAP);
 
-        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
-                | BadPaddingException | NoSuchPaddingException e) {
-            VpnStatus.logError(R.string.error_rsa_sign, e.getClass().toString(), e.getLocalizedMessage());
-            return null;
+            } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException
+                    | BadPaddingException | NoSuchPaddingException e) {
+                VpnStatus.logError(R.string.error_rsa_sign, e.getClass().toString(), e.getLocalizedMessage());
+                return null;
+            }
         }
     }
 
@@ -1062,6 +1176,29 @@ public class VpnProfile implements Serializable, Cloneable {
             return null;
         }
     }
+
+    protected void slotEventHappened(NativeLong id) throws Pkcs11Exception {
+        CK_SLOT_INFO slotInfo = new CK_SLOT_INFO();
+        NativeLong rv;
+        rv = RtPkcs11Library.getInstance().C_GetSlotInfo(id, slotInfo);
+
+        if (!rv.equals(Pkcs11Constants.CKR_OK)) {
+            throw Pkcs11Exception.exceptionWithCode(rv);
+        }
+
+        Log.d("PKCS11", "Slot flag: " + slotInfo.flags.intValue());
+    }
+
+    @Override
+    public void onDialogPositiveClick(String pin) {
+        mTokenPin = pin;
+    }
+
+    @Override
+    public void onDialogNegativeClick() {
+        mTokenPin = "cancel";
+    }
+
 
 
 }

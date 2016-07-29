@@ -9,6 +9,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -23,6 +24,9 @@ dependencies {
 android {
     compileSdkVersion 24
     buildToolsVersion '24.0.0'
+    lintOptions {
+        abortOnError false
+    }
 
     defaultConfig {
         minSdkVersion 14
@@ -117,6 +121,75 @@ android {
 
 
 }
+
+def requireFileInDirectory(String directory, String file) {
+    if (fileTree(dir: directory, include: '**/' + file).isEmpty()) {
+        throw new GradleException('Not found ' + file + ' in ' + directory + ' directory')
+    }
+}
+
+def sdkCopyPkcs11() {
+    if (fileTree(dir: 'libs', include: '**/' + 'librtpkcs11ecp.so').isEmpty() && !fileTree(dir: '../../../../../Libs/android/native/pkcs11/', include: 'librtpkcs11ecp.so').isEmpty()) {
+        copy {
+            from fileTree(dir: '../../../../../Libs/android/native/pkcs11/', include: 'librtpkcs11ecp.so')
+            into 'libs/'
+        }
+    }
+}
+
+task extractJniDispatchFromJar {
+    requireFileInDirectory('deps', 'android-arm.jar')
+    FileTree tree = zipTree('deps/android-arm.jar')
+    FileTree filtered = tree.matching {
+        include 'libjnidispatch.so'
+    }
+    copy {
+        from filtered
+        into buildDir.getPath() + "/native-libs/"
+    }
+
+}
+
+task prepareNativeLibs() {
+    sdkCopyPkcs11()
+    requireFileInDirectory('libs', 'librtpkcs11ecp.so')
+    copy {
+        from fileTree(dir: 'libs', include: '**/*.so')
+        into buildDir.getPath() + '/native-libs/'
+    }
+}
+
+task nativeLibsToJar(type: Zip, description: 'create a jar archive of the native libs', dependsOn: ['prepareNativeLibs', 'extractJniDispatchFromJar']) {
+    requireFileInDirectory(buildDir.getPath() + "/native-libs", 'libjnidispatch.so')
+    requireFileInDirectory(buildDir.getPath() + "/native-libs", 'librtpkcs11ecp.so')
+    destinationDir file(buildDir.getPath() + "/native-libs")
+    baseName 'native-libs'
+    extension 'jar'
+    from fileTree(dir: buildDir.getPath() + '/native-libs', include: '**/*.so')
+    into 'lib/armeabi/'
+}
+
+clean {
+    delete "../eclipse-project"
+}
+
+tasks.withType(JavaCompile) {
+    compileTask -> compileTask.dependsOn(nativeLibsToJar)
+}
+
+/*dependencies {
+    compile files("$buildDir/native-libs/native-libs.jar") {
+        builtBy 'nativeLibsToJar'
+    }
+}*/
+
+dependencies {
+    compile fileTree(dir: "libs", include: "*.jar")
+    //compile 'com.madgag.spongycastle:core:1.52.0.0'
+    compile 'com.madgag.spongycastle:prov:1.52.0.0'
+    compile 'com.madgag.spongycastle:pkix:1.52.0.0'
+}
+
 
 
 

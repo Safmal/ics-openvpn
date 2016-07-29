@@ -361,4 +361,6 @@
   <string name="ab_secondary_users_title">Vedlejší uživaté tabletu</string>
   <string name="custom_connection_options">Vlastní možnosti</string>
   <string name="remove_connection_entry">Odstranit položku připojení</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

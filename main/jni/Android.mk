@@ -10,6 +10,7 @@ JNI_DIR := $(call my-dir)
 
 include lzo/Android.mk
 include openssl/Android.mk
+include pkcs11-helper/Android.mk
 
 ifeq ($(TARGET_ARCH),mips)
 	USE_BREAKPAD=0

@@ -148,4 +148,6 @@
   <string name="openvpn_log">OpenVPN Logg</string>
   <string name="import_config">Importer OpenVPN konfigurasjon</string>
   <string name="battery_consumption_title">Batteriforbruk</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

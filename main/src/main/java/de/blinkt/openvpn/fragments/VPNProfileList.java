@@ -33,6 +33,7 @@ import de.blinkt.openvpn.activities.FileSelect;
 import de.blinkt.openvpn.activities.VPNPreferences;
 import de.blinkt.openvpn.core.ProfileManager;
 import de.blinkt.openvpn.core.VpnStatus;
+import de.blinkt.openvpn.pkcs11.exception.Pkcs11CallerException;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -433,6 +434,16 @@ public class VPNProfileList extends ListFragment implements OnClickListener, Vpn
 
     private void startVPN(VpnProfile profile) {
 
+        if (profile.mToken != null) {
+            if (profile.mToken.getSession() != null) {
+                try {
+                    profile.mToken.close();
+                } catch (Pkcs11CallerException e) {
+                    e.printStackTrace();
+                }
+            }
+            profile.mToken = null;
+        }
         getPM().saveProfile(getActivity(), profile);
 
         Intent intent = new Intent(getActivity(), LaunchVPN.class);

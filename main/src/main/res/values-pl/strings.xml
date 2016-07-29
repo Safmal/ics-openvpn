@@ -396,4 +396,6 @@ OpenVPN dla Androida ostrzeże Cię o tym w logu.<p>Kiedy VPN ustawi serwer DNS 
   <string name="samsung_broken_title">Telefony Samsung</string>
   <string name="novpn_selected">Nie wybrano VPN.</string>
   <string name="alwaysonvpn">VPN używany podczas rozruchu i zawsze włączony</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

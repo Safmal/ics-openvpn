@@ -410,4 +410,6 @@
   <string name="samsung_broken_title">Samsung telefonok</string>
   <string name="novpn_selected">Nincs VPN kiválasztva.</string>
   <string name="alwaysonvpn">VPN használata rendszer indításkor és legyen mindig aktív</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

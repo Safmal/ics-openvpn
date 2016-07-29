@@ -344,4 +344,6 @@ Effettuata la lettura del file di configurazione</string>
   <string name="show_log">Mostra il log</string>
   <string name="version_upto">%s e precedenti</string>
   <string name="copy_of_profile">Copia di %s</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

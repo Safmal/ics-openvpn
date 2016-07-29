@@ -287,6 +287,7 @@ public class ConfigParser {
             "topology",
             "user",
             "win-sys",
+            "pkcs11-providers",
     };
 
     final String[][] ignoreOptionsWithArg =
@@ -686,6 +687,30 @@ public class ConfigParser {
         Vector<String> ocusername = meta.get("USERNAME");
         if (ocusername != null && ocusername.size() > 1)
             np.mUsername = ocusername.get(1);
+
+        // Added for PKCS11 //
+
+        /*Vector<String> pkcs11Provider = getOption("pkcs11-providers", 1, 1);
+        if (pkcs11Provider != null)
+        {
+            np.mPkcs11Provider = pkcs11Provider.get(1);
+        }*/
+
+        Vector<String> pkcs11Id = getOption("pkcs11-id", 1, 1);
+        if (pkcs11Id != null)
+        {
+            np.mPkcs11Id = pkcs11Id.get(1);
+            np.mAuthenticationType = VpnProfile.TYPE_PKCS11;
+        }
+
+        Vector<String> tokenPin = getOption("token-pin", 1, 1);
+        if (tokenPin != null){
+            np.mTokenPin = tokenPin.get(1);
+        }
+        else if (pkcs11Id != null){
+            np.mTokenPin = "";
+        }
+        //**//
 
         checkIgnoreAndInvalidOptions(np);
         fixup(np);

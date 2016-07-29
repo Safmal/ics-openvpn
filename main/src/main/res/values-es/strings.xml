@@ -399,4 +399,6 @@ hacia/de Móvil)</string>
   <string name="samsung_broken_title">Celulares Samsung</string>
   <string name="novpn_selected">VPN no seleccionado.</string>
   <string name="alwaysonvpn">VPN al reiniciar y siempre activo</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

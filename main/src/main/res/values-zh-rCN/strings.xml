@@ -375,4 +375,6 @@
   <string name="query_permissions_sdcard">OpenVPN for Android 可以尝试自动在 SD 卡上寻找缺失的文件。点击此消息开始请求权限许可。</string>
   <string name="protocol">协议</string>
   <string name="enabled_connection_entry">启用</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

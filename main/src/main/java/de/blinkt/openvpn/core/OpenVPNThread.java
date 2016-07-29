@@ -122,6 +122,8 @@ public class OpenVPNThread implements Runnable {
 
     private void startOpenVPNThreadArgs(String[] argv) {
         LinkedList<String> argvlist = new LinkedList<String>();
+        //argvlist.add(argv[0]);
+        //argvlist.add("--help");
 
         Collections.addAll(argvlist, argv);
 

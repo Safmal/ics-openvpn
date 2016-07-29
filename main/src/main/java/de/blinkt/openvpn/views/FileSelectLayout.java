@@ -142,7 +142,7 @@ public class FileSelectLayout extends LinearLayout implements OnClickListener {
         mData = data;
         if (data == null) {
             mDataView.setText(c.getString(R.string.no_data));
-            mDataDetails.setText("");
+            mDataDetails.setText(""); //
             mShowClearButton.setVisibility(GONE);
         } else {
             if (mData.startsWith(VpnProfile.DISPLAYNAME_TAG)) {
@@ -152,6 +152,7 @@ public class FileSelectLayout extends LinearLayout implements OnClickListener {
             else
                 mDataView.setText(data);
             if (mIsCertificate) {
+
                 mDataDetails.setText(X509Utils.getCertificateFriendlyName(c, data));
             }
 

@@ -410,4 +410,6 @@
   <string name="samsung_broken_title">Samsung-Geräte</string>
   <string name="novpn_selected">Kein VPN ausgewählt</string>
   <string name="alwaysonvpn">VPN beim Gerätestart und für Always-On verwenden</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

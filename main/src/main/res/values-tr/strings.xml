@@ -400,4 +400,6 @@
   <string name="pw_request_dialog_prompt">Lütfen %1$s profili için parola girin</string>
   <string name="menu_use_inline_data">Satır içi veri kullan</string>
   <string name="samsung_broken_title">Samsung telefonlar</string>
+  <string name="token_pin">Token pin</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>

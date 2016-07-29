@@ -410,4 +410,6 @@
   <string name="samsung_broken_title">Телефоны Samsung</string>
   <string name="novpn_selected">Не выбрано VPN.</string>
   <string name="alwaysonvpn">VPN, используемый при загрузке и для Always-On</string>
+  <string name="token_pin">Пин токена</string>
+  <string name="pkcs11_id">PKCS11 id</string>
 </resources>
